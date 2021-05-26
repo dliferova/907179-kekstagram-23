@@ -1,6 +1,6 @@
 # Личный проект «Кекстаграм»
 
-* Студент: [Дарья Лиферова](https://up.htmlacademy.ru/javascript/23/user/907179).
+* Студент: [Дарья Лиферова](https://htmlacademy.ru/profile/id907179).
 * Наставник: [Артём Рудов](https://htmlacademy.ru/profile/artrudov).
 
 ---
