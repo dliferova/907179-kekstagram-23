@@ -1,20 +1,32 @@
-// Функция возвращающая случайное число
-
-const getRandomFromRange = function(startNumber, endNumber) {
-  if(startNumber < 0) {
-    return undefined;
+/**
+ * Возвращает случайное число.
+ * @param startNumber - Начальное значение диапазона.
+ * @param endNumber - Конечное значение диапазона.
+ * @returns {number} - Случайное число из диапазона.
+ */
+const getRandomFromRange = function(startNumber = 0, endNumber = 0) {
+  if (startNumber < 0) {
+    startNumber = 0;
   }
-  if (endNumber <= startNumber) {
-    return undefined;
+  if (endNumber < 0) {
+    endNumber = 0;
   }
-  // источник https://schoolsw3.com/js/js_random.php
-  return Math.floor(Math.random() * (endNumber - startNumber + 1) ) + startNumber;
+  if (endNumber < startNumber) {
+    const tmp = startNumber;
+    startNumber = endNumber;
+    endNumber = tmp;
+  }
+  return Math.floor(Math.random() * (startNumber - endNumber + 1) ) + endNumber;
 };
 
-getRandomFromRange(5, 50);
+getRandomFromRange(7, 50);
 
-// Функция для проверки максимальной длины строки
-
+/**
+ * Проверяет максимальную длину строки.
+ * @param string - Проверяемая строка.
+ * @param maxLength - Максимально возможная длина строки.
+ * @returns {boolean} - Результат проверки.
+ */
 const checkStringLength = function(string, maxLength) {
   return string.length <= maxLength;
 };
