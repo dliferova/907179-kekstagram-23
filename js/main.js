@@ -72,7 +72,7 @@ const generate = function() {
     const comments = [];
 
     for (let index = 0; index < getRandomFromRange(3, 7); index++) {
-      comments.push(createComment(index + 1));
+      comments.push( createComment(index + 1) );
     }
 
     return comments;
