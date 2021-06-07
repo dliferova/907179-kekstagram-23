@@ -36,7 +36,6 @@ const checkStringLength = function(string, maxLength) {
 
 checkStringLength('Это мое домашнее задание', 50);
 
-
 const generate = function() {
   const objects = [];
 
@@ -47,7 +46,7 @@ const generate = function() {
       'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
       'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
       'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-      'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+      'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!',
     ];
 
     const possibleNames = [
@@ -56,34 +55,42 @@ const generate = function() {
       'Николай',
       'Илья',
       'Яна',
-      'Дарья'
-    ]
+      'Дарья',
+    ];
 
     const authorId = getRandomFromRange(1, 6);
 
     return {
       id: id,
-      avatar: 'img/avatar-' + authorId + '.svg',
+      avatar: `img/avatar-${  authorId  }.svg`,
       message: possibleMessages[getRandomFromRange(0, possibleMessages.length - 1)],
-      name: possibleNames[authorId - 1]
+      name: possibleNames[authorId - 1],
     };
-  }
+  };
 
-  for (let i = 0; i < 25; i++) {
-    const id = i + 1;
+  const generateComments = function () {
+    const comments = [];
 
-    objects[i] = {
+    for (let index = 0; index < getRandomFromRange(3, 7); index++) {
+      comments.push(createComment(index + 1));
+    }
+
+    return comments;
+  };
+
+  for (let index = 0; index < 25; index++) {
+    const id = index + 1;
+
+    objects[index] = {
       id: id,
-      url: 'photos/' + id + '.jpg',
+      url: `photos/${  id  }.jpg`,
       description: 'Моя новая фотография.',
       likes: getRandomFromRange(15, 200),
-      comments: [
-        createComment(135)
-      ]
-    }
+      comments: generateComments(),
+    };
   }
 
   return objects;
 };
 
-console.log(generate());
+generate();
