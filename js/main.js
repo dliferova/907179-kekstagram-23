@@ -64,7 +64,7 @@ const POSSIBLE_PHOTO_DESCRIPTION = 'Это новое фото.';
 const getRandomArrayElement = (elements) => elements[getRandomFromRange(0, elements.length - 1)];
 
 const createComment = (id) => ({
-  id: id,
+  id,
   avatar: `img/avatar-${getRandomFromRange(MIN_AVATAR_ID, MAX_AVATAR_ID)}.svg`,
   message: getRandomArrayElement(POSSIBLE_COMMENT_MESSAGES),
   name: getRandomArrayElement(POSSIBLE_COMMENT_NAMES),
@@ -75,7 +75,7 @@ const generateComments = () => new Array(getRandomFromRange(MIN_COMMENTS_NUMBER,
   .map((element, index) => createComment(index + 1));
 
 const createPhoto = (id) => ({
-  id: id,
+  id,
   url: `photos/${id}.jpg`,
   description: POSSIBLE_PHOTO_DESCRIPTION,
   likes: getRandomFromRange(LIKES_MIN_NUMBER, LIKES_MAX_NUMBER),
