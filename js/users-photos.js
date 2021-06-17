@@ -15,7 +15,7 @@ generatedPhotosArray.forEach((photo) => {
   pictureElement.querySelector('.picture__comments').textContent = photo.comments.length;
   pictureElement.querySelector('.picture__likes').textContent = photo.likes;
   pictureElement.querySelector('.picture__img').src = photo.url;
-  picturesFromUsersContainer.appendChild(pictureElement);
+  photosListFragment.appendChild(pictureElement);
 });
 
 picturesFromUsersContainer.appendChild(photosListFragment);
