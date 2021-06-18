@@ -22,8 +22,6 @@ const getRandomFromRange = function(startNumber = 0, endNumber = 0) {
   return Math.floor(Math.random() * (startNumber - endNumber + 1) ) + endNumber;
 };
 
-export {getRandomFromRange};
-
 /**
  * Проверяет максимальную длину строки.
  * @param string - Проверяемая строка.
@@ -34,4 +32,6 @@ const checkStringLength = function(string, maxLength) {
   return string.length <= maxLength;
 };
 
-export {checkStringLength};
+const getRandomArrayElement = (elements) => elements[getRandomFromRange(0, elements.length - 1)];
+
+export {getRandomFromRange, checkStringLength, getRandomArrayElement};

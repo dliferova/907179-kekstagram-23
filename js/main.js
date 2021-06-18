@@ -5,3 +5,6 @@ import './util.js';
 import {generatePhotos} from './data.js';
 
 generatePhotos();
+
+//Модуль с отображением фотографии других пользователей
+import './users-photos.js';

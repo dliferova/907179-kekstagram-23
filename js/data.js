@@ -1,4 +1,4 @@
-import {getRandomFromRange} from './util.js';
+import {getRandomFromRange, getRandomArrayElement} from './util.js';
 
 const TOTAL_PHOTOS_NUMBER = 25;
 const LIKES_MIN_NUMBER = 15;
@@ -24,8 +24,6 @@ const POSSIBLE_COMMENT_NAMES = [
   'Дарья',
 ];
 const POSSIBLE_PHOTO_DESCRIPTION = 'Это новое фото.';
-
-const getRandomArrayElement = (elements) => elements[getRandomFromRange(0, elements.length - 1)];
 
 const createComment = (id) => ({
   id,
