@@ -8,19 +8,21 @@ const renderData = (rootElement, photo) => {
   rootElement.querySelector('.social__caption').textContent = photo.description;
 
   const commentsElement = rootElement.querySelector('.social__comments');
-  const commentTemplate = document.querySelector('#comment')
-    .content
-    .querySelector('.social__comment');
 
   const commentsListFragment = document.createDocumentFragment();
 
-  photo.comments.forEach((comment) => {
+  const renderComment = (comment) => {
+    const commentTemplate = document.querySelector('#comment')
+      .content
+      .querySelector('.social__comment');
     const commentElement = commentTemplate.cloneNode(true);
     commentElement.querySelector('.social__picture').src = comment.avatar;
     commentElement.querySelector('.social__picture').alt = comment.name;
     commentElement.querySelector('.social__text').textContent = comment.message;
     commentsListFragment.appendChild(commentElement);
-  });
+  };
+
+  photo.comments.forEach(renderComment);
 
   commentsElement.appendChild(commentsListFragment);
 };
