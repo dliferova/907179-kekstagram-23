@@ -34,4 +34,6 @@ const checkStringLength = function(string, maxLength) {
 
 const getRandomArrayElement = (elements) => elements[getRandomFromRange(0, elements.length - 1)];
 
-export {getRandomFromRange, checkStringLength, getRandomArrayElement};
+const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
+export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent};

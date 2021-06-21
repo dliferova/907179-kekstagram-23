@@ -1,4 +1,5 @@
 import './photo-thumbnails.js';
+import {isEscEvent} from './util.js';
 
 const renderData = (rootElement, photo) => {
   rootElement.classList.remove('hidden');
@@ -40,13 +41,14 @@ const initModalClosing = function(rootElement) {
   });
 
   document.addEventListener('keydown', (evt) => {
-    if (evt.keyCode === 27) {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
       closeModal(rootElement);
     }
   });
 };
 
-export const openModal = function(photo) {
+export const openModal= function(photo) {
   const rootElement = document.querySelector('.big-picture');
   document.querySelector('body').classList.add('modal-open');
   rootElement.querySelector('.social__comment-count').classList.add('hidden');
@@ -54,5 +56,3 @@ export const openModal = function(photo) {
   renderData(rootElement, photo);
   initModalClosing(rootElement);
 };
-
-
