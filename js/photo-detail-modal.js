@@ -48,6 +48,8 @@ const initModalClosing = function(rootElement) {
   });
 };
 
+export const photoNumber = 7;
+
 export const openModal= function(photo) {
   const rootElement = document.querySelector('.big-picture');
   document.querySelector('body').classList.add('modal-open');
