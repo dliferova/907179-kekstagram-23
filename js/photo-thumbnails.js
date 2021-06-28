@@ -18,4 +18,3 @@ export const renderThumbnails = (photos) => {
 
   picturesFromUsersContainer.appendChild(photosListFragment);
 };
-
