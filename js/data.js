@@ -5,8 +5,8 @@ const LIKES_MIN_NUMBER = 15;
 const LIKES_MAX_NUMBER = 200;
 const MIN_AVATAR_ID = 1;
 const MAX_AVATAR_ID = 6;
-const MIN_COMMENTS_NUMBER = 2;
-const MAX_COMMENTS_NUMBER = 7;
+const MIN_COMMENTS_NUMBER = 11;
+const MAX_COMMENTS_NUMBER = 25;
 const POSSIBLE_COMMENT_MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -23,7 +23,7 @@ const POSSIBLE_COMMENT_NAMES = [
   'Яна',
   'Дарья',
 ];
-const POSSIBLE_PHOTO_DESCRIPTION = 'Это новое фото.';
+const POSSIBLE_PHOTO_DESCRIPTION = 'Как вам мое новое фото?';
 
 const createComment = (id) => ({
   id,

@@ -3,4 +3,3 @@ import './util.js';
 
 //Модуль галереи
 import './gallery.js';
-
