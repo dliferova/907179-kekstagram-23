@@ -2,6 +2,7 @@ import './photo-thumbnails.js';
 import {isEscEvent} from './util.js';
 
 const MAX_NUMBER_PREVIEW_COMMENTS = 5;
+const SHOW_MORE_COMMENTS_STEP = 5;
 
 const renderData = (rootElement, photo) => {
   rootElement.classList.remove('hidden');
@@ -25,42 +26,57 @@ const renderData = (rootElement, photo) => {
     commentsListFragment.appendChild(commentElement);
   };
 
-  const promoComments = photo.comments.slice(0,MAX_NUMBER_PREVIEW_COMMENTS);
-  promoComments.forEach(renderComment);
-
-  commentsElement.appendChild(commentsListFragment);
-
   const commentsLoaderButton = document.querySelector('.social__comments-loader');
   const visibleCommentsCountElement = document.querySelector('.visible-comments-count');
-  let visibleCommentsCount =  promoComments.length;
-  visibleCommentsCountElement.textContent = visibleCommentsCount;
+  let visibleCommentsCount;
   const totalCommentsCount = photo.comments.length;
-  const STEP = 5;
 
-  if (totalCommentsCount < MAX_NUMBER_PREVIEW_COMMENTS) {
-    rootElement.querySelector('.social__comment-count').classList.remove('hidden');
-  } else {
-    rootElement.querySelector('.social__comment-count').classList.remove('hidden');
-    rootElement.querySelector('.comments-loader').classList.remove('hidden');
-  }
-
-  commentsLoaderButton.addEventListener('click', () => {
-    let counter = visibleCommentsCount + STEP;
-
-    if (totalCommentsCount < counter) {
-      counter = totalCommentsCount;
-      commentsLoaderButton.classList.add('hidden');
-    }
-
-    photo.comments.slice(visibleCommentsCount,counter).forEach(renderComment);
-
-    visibleCommentsCount = counter;
-    visibleCommentsCountElement.textContent = visibleCommentsCount;
+  const showComments = (from, to) => {
+    const commentsToShow = photo.comments.slice(from, to);
+    commentsToShow.forEach(renderComment);
 
     commentsElement.appendChild(commentsListFragment);
 
+    if (photo.comments.length < to) {
+      visibleCommentsCount = photo.comments.length;
+    } else {
+      visibleCommentsCount = to;
+    }
+
+    visibleCommentsCountElement.textContent = visibleCommentsCount;
+  };
+
+  const showCommentsLoader = () => {
+    commentsLoaderButton.classList.remove('hidden');
+  };
+
+  const hideCommentsLoader = () => {
+    commentsLoaderButton.classList.add('hidden');
+  };
+
+  const showCommentsCount = () => {
+    rootElement.querySelector('.social__comment-count').classList.remove('hidden');
+  };
+
+  showComments(0, MAX_NUMBER_PREVIEW_COMMENTS);
+
+  showCommentsCount();
+
+  if (totalCommentsCount > MAX_NUMBER_PREVIEW_COMMENTS) {
+    showCommentsLoader();
+  }
+
+  commentsLoaderButton.addEventListener('click', () => {
+    let counter = visibleCommentsCount + SHOW_MORE_COMMENTS_STEP;
+
+    if (totalCommentsCount < counter) {
+      counter = totalCommentsCount;
+    }
+
+    showComments(visibleCommentsCount, counter);
+
     if (visibleCommentsCount === totalCommentsCount) {
-      commentsLoaderButton.classList.add('hidden');
+      hideCommentsLoader();
     }
   });
 };
@@ -91,7 +107,7 @@ export const openModal= function(photo) {
   const rootElement = document.querySelector('.big-picture');
   document.querySelector('body').classList.add('modal-open');
   rootElement.querySelector('.social__comment-count').classList.add('hidden');
-  rootElement.querySelector('.comments-loader').classList.add('hidden');
+  rootElement.querySelector('.social__comments-loader').classList.add('hidden');
   renderData(rootElement, photo);
   initModalClosing(rootElement);
 };
