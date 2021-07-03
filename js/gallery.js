@@ -7,7 +7,7 @@ const photos = generatePhotos();
 renderThumbnails(photos);
 
 document.querySelectorAll('.picture')
-  .forEach((element) => element.addEventListener('click', () => openModal(photos[0])));
+  .forEach((element, index) => element.addEventListener('click', () => openModal(photos[index])));
 
 const openFormElement = document.querySelector('.img-upload__input');
 openFormElement.addEventListener('change', openForm);
