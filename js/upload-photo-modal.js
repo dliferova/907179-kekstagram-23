@@ -3,6 +3,9 @@ import {isEscEvent, checkStringLength} from './util.js';
 const REG_HASTAG = /^#[A-Za-zА-Яа-я0-9]{1,19}$/;
 const MAX_HASTAGS_COUNT = 5;
 const MAX_COMMENT_LENGTH = 140;
+const SCALE_STEP = 25;
+const MAX_SCALE_VALUE = 100;
+const MIN_SCALE_VALUE = 25;
 
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
@@ -10,7 +13,38 @@ const uploadCancel = uploadForm.querySelector('.img-upload__cancel');
 const uploadText = uploadForm.querySelector('.img-upload__text');
 const textHashtags = uploadText.querySelector('.text__hashtags');
 const commentField = uploadText.querySelector('.text__description');
+const scaleUp = uploadForm.querySelector('.scale__control--bigger');
+const scaleInput = uploadForm.querySelector('.scale__control--value');
+const scaleDown = uploadForm.querySelector('.scale__control--smaller');
+const previewImg = uploadForm.querySelector('.img-upload__preview');
 
+let scaleValue = 100;
+
+const renderScaleValue = () => {
+  scaleInput.value = scaleValue + '%';
+};
+
+renderScaleValue();
+
+const changeScale = (value) => {
+  previewImg.style.transform = `scale(${value / 100})`;
+};
+
+scaleUp.addEventListener('click', () => {
+  if (scaleValue < MAX_SCALE_VALUE) {
+    scaleValue = scaleValue + SCALE_STEP;
+    renderScaleValue();
+    changeScale(scaleValue);
+  }
+});
+
+scaleDown.addEventListener('click', () => {
+  if (scaleValue > MIN_SCALE_VALUE) {
+    scaleValue = scaleValue - SCALE_STEP;
+    renderScaleValue();
+    changeScale(scaleValue);
+  }
+});
 
 export const openForm = () => {
   uploadOverlay.classList.remove('hidden');
