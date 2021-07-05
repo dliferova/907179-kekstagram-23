@@ -1,4 +1,4 @@
-import {isEscEvent, checkStringLength} from './util.js';
+import {isEscEvent, checkStringLength, removeAllClassesByRegexp} from './util.js';
 
 const REG_HASTAG = /^#[A-Za-zА-Яа-я0-9]{1,19}$/;
 const MAX_HASTAGS_COUNT = 5;
@@ -109,3 +109,15 @@ const onKeyPress = (evt) => {
 };
 
 document.addEventListener('keydown', onKeyPress);
+
+const effectsList = document.querySelector('.effects__list');
+
+const applyEffect = (evt) => {
+  if (evt.target.matches('input[type="radio"]')) {
+    const effectValue = evt.target.value;
+    removeAllClassesByRegexp(previewImg, /effects__preview--.*/);
+    previewImg.classList.add(`effects__preview--${effectValue}`);
+  }
+};
+
+effectsList.addEventListener('change', applyEffect);

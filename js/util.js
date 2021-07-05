@@ -36,4 +36,11 @@ const getRandomArrayElement = (elements) => elements[getRandomFromRange(0, eleme
 
 const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent};
+const removeAllClassesByRegexp = (element, regexp) => {
+  const classNames = [].slice.apply(element.classList);
+  const classNamesToDelete = classNames.filter((className) => regexp.test(className));
+
+  classNamesToDelete.forEach((className) => element.classList.remove(className));
+};
+
+export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent, removeAllClassesByRegexp};

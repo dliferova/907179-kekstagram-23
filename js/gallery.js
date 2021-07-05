@@ -10,5 +10,5 @@ document.querySelectorAll('.picture')
   .forEach((element, index) => element.addEventListener('click', () => openModal(photos[index])));
 
 const openFormElement = document.querySelector('.img-upload__input');
-// openForm();
+openForm();
 openFormElement.addEventListener('change', openForm);
