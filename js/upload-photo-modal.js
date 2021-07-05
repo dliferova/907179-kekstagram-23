@@ -18,56 +18,49 @@ const scaleInput = uploadForm.querySelector('.scale__control--value');
 const scaleDown = uploadForm.querySelector('.scale__control--smaller');
 const previewImg = uploadForm.querySelector('.img-upload__preview');
 
-let scaleValue = 100;
+let scaleValue;
 
 const renderScaleValue = () => {
-  scaleInput.value = scaleValue + '%';
+  scaleInput.value = `${scaleValue}%`;
 };
-
-renderScaleValue();
 
 const changeScale = (value) => {
   previewImg.style.transform = `scale(${value / 100})`;
 };
 
-scaleUp.addEventListener('click', () => {
+const onScaleUpClick = () => {
   if (scaleValue < MAX_SCALE_VALUE) {
     scaleValue = scaleValue + SCALE_STEP;
     renderScaleValue();
     changeScale(scaleValue);
   }
-});
+};
 
-scaleDown.addEventListener('click', () => {
+scaleUp.addEventListener('click', onScaleUpClick);
+
+const onScaleDownClick = () => {
   if (scaleValue > MIN_SCALE_VALUE) {
     scaleValue = scaleValue - SCALE_STEP;
     renderScaleValue();
     changeScale(scaleValue);
   }
-});
+};
+
+scaleDown.addEventListener('click', onScaleDownClick);
+
+const initializeForm = () => {
+  scaleValue = 100;
+  renderScaleValue();
+  changeScale(scaleValue);
+};
 
 export const openForm = () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
+  initializeForm();
 };
 
-const closeForm = () => {
-  uploadOverlay.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-};
-
-uploadCancel.addEventListener('click', closeForm);
-
-const onKeyPress = (evt) => {
-  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
-    evt.preventDefault();
-    closeForm();
-  }
-};
-
-document.addEventListener('keydown', onKeyPress);
-
-textHashtags.addEventListener('input', () => {
+const onHashtagsInput = () => {
 
   const value = textHashtags.value.toLowerCase();
   const hashtags = value.split(' ');
@@ -84,9 +77,11 @@ textHashtags.addEventListener('input', () => {
   }
 
   textHashtags.reportValidity();
-});
+};
 
-commentField.addEventListener('input', () => {
+textHashtags.addEventListener('input', onHashtagsInput);
+
+const onCommentInput = () => {
 
   if (!checkStringLength(commentField.value, MAX_COMMENT_LENGTH)) {
     commentField.setCustomValidity(`Длина вашего комментария не может быть больше ${MAX_COMMENT_LENGTH} символов`);
@@ -95,4 +90,22 @@ commentField.addEventListener('input', () => {
   }
 
   commentField.reportValidity();
-});
+};
+
+commentField.addEventListener('input', onCommentInput);
+
+const closeForm = () => {
+  uploadOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+};
+
+uploadCancel.addEventListener('click', closeForm);
+
+const onKeyPress = (evt) => {
+  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
+    evt.preventDefault();
+    closeForm();
+  }
+};
+
+document.addEventListener('keydown', onKeyPress);
