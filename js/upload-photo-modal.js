@@ -17,6 +17,11 @@ const scaleUp = uploadForm.querySelector('.scale__control--bigger');
 const scaleInput = uploadForm.querySelector('.scale__control--value');
 const scaleDown = uploadForm.querySelector('.scale__control--smaller');
 const previewImg = uploadForm.querySelector('.img-upload__preview');
+const effectsList = document.querySelector('.effects__list');
+
+const sliderElement = document.querySelector('.effect-level__slider');
+const sliderFieldset = document.querySelector('.effect-level');
+const sliderValueElement = document.querySelector('.effect-level__value');
 
 let scaleValue;
 
@@ -52,6 +57,7 @@ const initializeForm = () => {
   scaleValue = 100;
   renderScaleValue();
   changeScale(scaleValue);
+  sliderFieldset.classList.add('hidden');
 };
 
 export const openForm = () => {
@@ -110,14 +116,83 @@ const onKeyPress = (evt) => {
 
 document.addEventListener('keydown', onKeyPress);
 
-const effectsList = document.querySelector('.effects__list');
+let appliedEffect;
+
+const updateSliderOptions = (min, max, start, step) => {
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: min,
+      max: max,
+    },
+    start: start,
+    step: step,
+  });
+};
 
 const applyEffect = (evt) => {
   if (evt.target.matches('input[type="radio"]')) {
-    const effectValue = evt.target.value;
-    removeAllClassesByRegexp(previewImg, /effects__preview--.*/);
-    previewImg.classList.add(`effects__preview--${effectValue}`);
+    appliedEffect = evt.target.value;
+
+    const showOrHideSlider = () => {
+      if (appliedEffect === 'none') {
+        sliderFieldset.classList.add('hidden');
+      } else {
+        sliderFieldset.classList.remove('hidden');
+      }
+    };
+
+    const applyNewEffectToSlider = () => {
+      if (appliedEffect === 'none') {
+        updateSliderOptions(0, 100, 100, 1);
+      } else if (appliedEffect === 'chrome' || appliedEffect === 'sepia') {
+        updateSliderOptions(0, 1, 1, 0.1);
+      } else if (appliedEffect === 'marvin') {
+        updateSliderOptions(0, 100, 100, 1);
+      } else if (appliedEffect === 'phobos') {
+        updateSliderOptions(0, 3, 3, 0.1);
+      } else if (appliedEffect === 'heat') {
+        updateSliderOptions(1, 3, 3, 0.1);
+      }
+    };
+
+    const applyEffectToImage = () => {
+      removeAllClassesByRegexp(previewImg, /effects__preview--.*/);
+      previewImg.classList.add(`effects__preview--${appliedEffect}`);
+    };
+
+    showOrHideSlider();
+    applyNewEffectToSlider();
+    applyEffectToImage();
   }
 };
 
 effectsList.addEventListener('change', applyEffect);
+
+sliderValueElement.value = 100;
+
+noUiSlider.create(sliderElement, {
+  range: {
+    min: 0,
+    max: 1,
+  },
+  start: 1,
+  step: 0.1,
+  connect: 'lower',
+});
+
+sliderElement.noUiSlider.on('update', (values, handle, unecoded) => {
+  sliderValueElement.value = unecoded[handle];
+  if (appliedEffect === 'none') {
+    previewImg.style.removeProperty('filter');
+  } else if (appliedEffect === 'chrome') {
+    previewImg.style.filter = `grayscale(${sliderValueElement.value})`;
+  } else if (appliedEffect === 'sepia') {
+    previewImg.style.filter = `sepia(${sliderValueElement.value})`;
+  } else if (appliedEffect === 'marvin') {
+    previewImg.style.filter = `invert(${sliderValueElement.value}%)`;
+  } else if (appliedEffect === 'phobos') {
+    previewImg.style.filter = `blur(${sliderValueElement.value}px)`;
+  } else if (appliedEffect === 'heat') {
+    previewImg.style.filter = `brightness(${sliderValueElement.value})`;
+  }
+});
