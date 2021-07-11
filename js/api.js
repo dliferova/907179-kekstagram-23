@@ -8,3 +8,15 @@ export const getPhotos = () => fetch(`${API_HOST}/kekstagram/data`)
       throw Error();
     }
   });
+
+export const sendForm = (formData) => fetch(
+  `${API_HOST}/kekstagram`,
+  {
+    method: 'POST',
+    body: formData,
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw Error();
+    }
+  });

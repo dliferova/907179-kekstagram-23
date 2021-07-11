@@ -1,4 +1,5 @@
 import {isEscEvent, checkStringLength, removeAllClassesByRegexp} from './util.js';
+import {sendForm} from './api.js';
 
 const REG_HASTAG = /^#[A-Za-zА-Яа-я0-9]{1,19}$/;
 const MAX_HASTAGS_COUNT = 5;
@@ -7,7 +8,9 @@ const SCALE_STEP = 25;
 const MAX_SCALE_VALUE = 100;
 const MIN_SCALE_VALUE = 25;
 const SCALE_START_VALUE = 100;
+const EFFECT_START_VALUE = 'none';
 
+const body = document.querySelector('body');
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const uploadCancel = uploadForm.querySelector('.img-upload__cancel');
@@ -111,6 +114,7 @@ scaleDown.addEventListener('click', onScaleDownClick);
 
 const initializeForm = () => {
   scaleValue = SCALE_START_VALUE;
+  appliedEffect = EFFECT_START_VALUE;
   renderScaleValue();
   changeScale(scaleValue);
   sliderFieldset.classList.add('hidden');
@@ -155,22 +159,6 @@ const onCommentInput = () => {
 };
 
 commentField.addEventListener('input', onCommentInput);
-
-const closeForm = () => {
-  uploadOverlay.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-};
-
-uploadCancel.addEventListener('click', closeForm);
-
-const onKeyPress = (evt) => {
-  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
-    evt.preventDefault();
-    closeForm();
-  }
-};
-
-document.addEventListener('keydown', onKeyPress);
 
 const updateSliderOptions = (options) => {
   sliderElement.noUiSlider.updateOptions({
@@ -218,16 +206,19 @@ const applyEffectToImage = (effectId) => {
   previewImg.classList.add(`effects__preview--${effectId}`);
 };
 
-const applyEffect = (evt) => {
+const applyEffect = (effect) => {
+  showOrHideSlider(effect);
+  applyNewEffectToSlider(effect);
+  applyEffectToImage(effect);
+};
+
+const onEffectChange = (evt) => {
   if (evt.target.matches('input[type="radio"]')) {
-    appliedEffect = evt.target.value;
-    showOrHideSlider(appliedEffect);
-    applyNewEffectToSlider(appliedEffect);
-    applyEffectToImage(appliedEffect);
+    applyEffect(evt.target.value);
   }
 };
 
-effectsList.addEventListener('change', applyEffect);
+effectsList.addEventListener('change', onEffectChange);
 
 sliderValueElement.value = SCALE_START_VALUE;
 
@@ -251,3 +242,83 @@ const applyFilterSettings = (values, handle, unecoded) => {
 };
 
 sliderElement.noUiSlider.on('update', applyFilterSettings);
+
+const closeForm = () => {
+  uploadOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  scaleValue = SCALE_START_VALUE;
+  changeScale(scaleValue);
+  appliedEffect = EFFECT_START_VALUE;
+  applyEffect(appliedEffect);
+  uploadForm.reset();
+};
+
+uploadCancel.addEventListener('click', closeForm);
+
+const onKeyPress = (evt) => {
+  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
+    evt.preventDefault();
+    closeForm();
+  }
+};
+
+document.addEventListener('keydown', onKeyPress);
+
+const showConfirmMessage = () => {
+  const successTemplate = document.querySelector('#success')
+    .content
+    .querySelector('.success');
+  const successElement = successTemplate.cloneNode(true);
+  body.appendChild(successElement);
+  const successButton = document.querySelector('.success__button');
+  const inner = document.querySelector('.success__inner');
+  successButton.addEventListener('click', () => successElement.parentNode.removeChild(successElement));
+  document.addEventListener('keydown', (evt) => {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      successElement.parentNode.removeChild(successElement);
+    }
+  });
+  successElement.addEventListener('click', (evt) => {
+    if (!inner.contains(evt.target)) {
+      successElement.parentNode.removeChild(successElement);
+    }
+  });
+};
+
+const showErrorMessage = () => {
+  const errorMessageTemplate = document.querySelector('#error')
+    .content
+    .querySelector('.error');
+  const errorElement = errorMessageTemplate.cloneNode(true);
+  body.appendChild(errorElement);
+  const errorButton = document.querySelector('.error__button');
+  const inner = document.querySelector('.error__inner');
+  errorButton.addEventListener('click', () => errorElement.parentNode.removeChild(errorButton));
+  document.addEventListener('keydown', (evt) => {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      errorElement.parentNode.removeChild(errorButton);
+    }
+  });
+  errorElement.addEventListener('click', (evt) => {
+    if (!inner.contains(evt.target)) {
+      errorElement.parentNode.removeChild(errorElement);
+    }
+  });
+};
+
+uploadForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const formData = new FormData(evt.target);
+
+  sendForm(formData)
+    .then(() => {
+      closeForm();
+      showConfirmMessage();
+    })
+    .catch(() => {
+      closeForm();
+      showErrorMessage();
+    });
+});
