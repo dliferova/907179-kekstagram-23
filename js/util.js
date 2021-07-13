@@ -43,4 +43,15 @@ const removeAllClassesByRegexp = (element, regexp) => {
   classNamesToDelete.forEach((className) => element.classList.remove(className));
 };
 
-export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent, removeAllClassesByRegexp};
+const removeNodeElement = (element) => {
+  element.parentNode.removeChild(element);
+};
+
+const deleteElementOnEsc = (evt, element) => {
+  if (isEscEvent(evt)) {
+    evt.preventDefault();
+    removeNodeElement(element);
+  }
+};
+
+export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent, removeAllClassesByRegexp, removeNodeElement, deleteElementOnEsc};

@@ -1,4 +1,4 @@
-import {isEscEvent, checkStringLength, removeAllClassesByRegexp} from './util.js';
+import {isEscEvent, checkStringLength, removeAllClassesByRegexp, removeNodeElement, deleteElementOnEsc} from './util.js';
 import {sendForm} from './api.js';
 
 const REG_HASTAG = /^#[A-Za-zА-Яа-я0-9]{1,19}$/;
@@ -29,7 +29,7 @@ const sliderValueElement = document.querySelector('.effect-level__value');
 let scaleValue;
 let appliedEffect;
 
-const effects = {
+const Effects = {
   ORIGINAL: {
     id: 'none',
     min: 0,
@@ -181,23 +181,23 @@ const showOrHideSlider = (effectId) => {
 
 const applyNewEffectToSlider = (effectId) => {
   switch (effectId) {
-    case effects.CHROME.id:
-      updateSliderOptions(effects.CHROME);
+    case Effects.CHROME.id:
+      updateSliderOptions(Effects.CHROME);
       break;
-    case effects.SEPIA.id:
-      updateSliderOptions(effects.SEPIA);
+    case Effects.SEPIA.id:
+      updateSliderOptions(Effects.SEPIA);
       break;
-    case effects.MARVIN.id:
-      updateSliderOptions(effects.MARVIN);
+    case Effects.MARVIN.id:
+      updateSliderOptions(Effects.MARVIN);
       break;
-    case effects.PHOBOS.id:
-      updateSliderOptions(effects.PHOBOS);
+    case Effects.PHOBOS.id:
+      updateSliderOptions(Effects.PHOBOS);
       break;
-    case effects.HEAT.id:
-      updateSliderOptions(effects.HEAT);
+    case Effects.HEAT.id:
+      updateSliderOptions(Effects.HEAT);
       break;
     default:
-      updateSliderOptions(effects.ORIGINAL);
+      updateSliderOptions(Effects.ORIGINAL);
   }
 };
 
@@ -243,69 +243,75 @@ const applyFilterSettings = (values, handle, unecoded) => {
 
 sliderElement.noUiSlider.on('update', applyFilterSettings);
 
-const closeForm = () => {
+const onUploadCancelClick = () => {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
+
   scaleValue = SCALE_START_VALUE;
   changeScale(scaleValue);
+
   appliedEffect = EFFECT_START_VALUE;
   applyEffect(appliedEffect);
+
   uploadForm.reset();
 };
 
-uploadCancel.addEventListener('click', closeForm);
+uploadCancel.addEventListener('click', onUploadCancelClick);
 
 const onKeyPress = (evt) => {
   if (isEscEvent(evt) && textHashtags !== document.activeElement) {
     evt.preventDefault();
-    closeForm();
+    onUploadCancelClick();
   }
 };
 
 document.addEventListener('keydown', onKeyPress);
 
-const showConfirmMessage = () => {
-  const successTemplate = document.querySelector('#success')
-    .content
-    .querySelector('.success');
-  const successElement = successTemplate.cloneNode(true);
-  body.appendChild(successElement);
-  const successButton = document.querySelector('.success__button');
-  const inner = document.querySelector('.success__inner');
-  successButton.addEventListener('click', () => successElement.parentNode.removeChild(successElement));
-  document.addEventListener('keydown', (evt) => {
-    if (isEscEvent(evt)) {
-      evt.preventDefault();
-      successElement.parentNode.removeChild(successElement);
-    }
-  });
-  successElement.addEventListener('click', (evt) => {
-    if (!inner.contains(evt.target)) {
-      successElement.parentNode.removeChild(successElement);
-    }
-  });
-};
+const openResultModal = (templateId) => {
+  const templateIdSelector = `#${templateId}`;
+  const rootSelector = `.${templateId}`;
+  const modalBodySelector = `.${templateId}__inner`;
+  const actionButtonSelector = `.${templateId}__button`;
 
-const showErrorMessage = () => {
-  const errorMessageTemplate = document.querySelector('#error')
+  const rootTemplate = document.querySelector(templateIdSelector)
     .content
-    .querySelector('.error');
-  const errorElement = errorMessageTemplate.cloneNode(true);
-  body.appendChild(errorElement);
-  const errorButton = document.querySelector('.error__button');
-  const inner = document.querySelector('.error__inner');
-  errorButton.addEventListener('click', () => errorElement.parentNode.removeChild(errorButton));
-  document.addEventListener('keydown', (evt) => {
-    if (isEscEvent(evt)) {
-      evt.preventDefault();
-      errorElement.parentNode.removeChild(errorButton);
+    .querySelector(rootSelector);
+  const rootElement = rootTemplate.cloneNode(true);
+  body.appendChild(rootElement);
+
+  const actionButtonElement = document.querySelector(actionButtonSelector);
+
+  let onButtonClick = null;
+  let onKeydown = null;
+  let onRootClick = null;
+
+  const unregister = () => {
+    actionButtonElement.removeEventListener('click', onButtonClick);
+    document.removeEventListener('keydown', onKeydown);
+    rootElement.removeEventListener('click', onRootClick);
+  };
+
+  onButtonClick = () => {
+    removeNodeElement(rootElement);
+    unregister();
+  };
+  actionButtonElement.addEventListener('click', onButtonClick);
+
+  onKeydown = (evt) => {
+    deleteElementOnEsc(evt, rootElement);
+    unregister();
+  };
+  document.addEventListener('keydown', onKeydown);
+
+  const modalBodyElement = document.querySelector(modalBodySelector);
+
+  onRootClick = (evt) => {
+    if (!modalBodyElement.contains(evt.target)) {
+      removeNodeElement(rootElement);
+      unregister();
     }
-  });
-  errorElement.addEventListener('click', (evt) => {
-    if (!inner.contains(evt.target)) {
-      errorElement.parentNode.removeChild(errorElement);
-    }
-  });
+  };
+  rootElement.addEventListener('click', onRootClick);
 };
 
 uploadForm.addEventListener('submit', (evt) => {
@@ -314,11 +320,11 @@ uploadForm.addEventListener('submit', (evt) => {
 
   sendForm(formData)
     .then(() => {
-      closeForm();
-      showConfirmMessage();
+      onUploadCancelClick();
+      openResultModal('success');
     })
     .catch(() => {
-      closeForm();
-      showErrorMessage();
+      onUploadCancelClick();
+      openResultModal('error');
     });
 });
