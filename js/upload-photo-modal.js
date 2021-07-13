@@ -1,4 +1,5 @@
-import {isEscEvent, checkStringLength, removeAllClassesByRegexp} from './util.js';
+import {isEscEvent, checkStringLength, removeAllClassesByRegexp, removeNodeElement, deleteElementOnEsc} from './util.js';
+import {sendForm} from './api.js';
 
 const REG_HASTAG = /^#[A-Za-zА-Яа-я0-9]{1,19}$/;
 const MAX_HASTAGS_COUNT = 5;
@@ -7,7 +8,9 @@ const SCALE_STEP = 25;
 const MAX_SCALE_VALUE = 100;
 const MIN_SCALE_VALUE = 25;
 const SCALE_START_VALUE = 100;
+const EFFECT_START_VALUE = 'none';
 
+const body = document.querySelector('body');
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const uploadCancel = uploadForm.querySelector('.img-upload__cancel');
@@ -26,7 +29,7 @@ const sliderValueElement = document.querySelector('.effect-level__value');
 let scaleValue;
 let appliedEffect;
 
-const effects = {
+const Effects = {
   ORIGINAL: {
     id: 'none',
     min: 0,
@@ -111,6 +114,7 @@ scaleDown.addEventListener('click', onScaleDownClick);
 
 const initializeForm = () => {
   scaleValue = SCALE_START_VALUE;
+  appliedEffect = EFFECT_START_VALUE;
   renderScaleValue();
   changeScale(scaleValue);
   sliderFieldset.classList.add('hidden');
@@ -156,22 +160,6 @@ const onCommentInput = () => {
 
 commentField.addEventListener('input', onCommentInput);
 
-const closeForm = () => {
-  uploadOverlay.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-};
-
-uploadCancel.addEventListener('click', closeForm);
-
-const onKeyPress = (evt) => {
-  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
-    evt.preventDefault();
-    closeForm();
-  }
-};
-
-document.addEventListener('keydown', onKeyPress);
-
 const updateSliderOptions = (options) => {
   sliderElement.noUiSlider.updateOptions({
     range: {
@@ -193,23 +181,23 @@ const showOrHideSlider = (effectId) => {
 
 const applyNewEffectToSlider = (effectId) => {
   switch (effectId) {
-    case effects.CHROME.id:
-      updateSliderOptions(effects.CHROME);
+    case Effects.CHROME.id:
+      updateSliderOptions(Effects.CHROME);
       break;
-    case effects.SEPIA.id:
-      updateSliderOptions(effects.SEPIA);
+    case Effects.SEPIA.id:
+      updateSliderOptions(Effects.SEPIA);
       break;
-    case effects.MARVIN.id:
-      updateSliderOptions(effects.MARVIN);
+    case Effects.MARVIN.id:
+      updateSliderOptions(Effects.MARVIN);
       break;
-    case effects.PHOBOS.id:
-      updateSliderOptions(effects.PHOBOS);
+    case Effects.PHOBOS.id:
+      updateSliderOptions(Effects.PHOBOS);
       break;
-    case effects.HEAT.id:
-      updateSliderOptions(effects.HEAT);
+    case Effects.HEAT.id:
+      updateSliderOptions(Effects.HEAT);
       break;
     default:
-      updateSliderOptions(effects.ORIGINAL);
+      updateSliderOptions(Effects.ORIGINAL);
   }
 };
 
@@ -218,16 +206,19 @@ const applyEffectToImage = (effectId) => {
   previewImg.classList.add(`effects__preview--${effectId}`);
 };
 
-const applyEffect = (evt) => {
+const applyEffect = (effect) => {
+  showOrHideSlider(effect);
+  applyNewEffectToSlider(effect);
+  applyEffectToImage(effect);
+};
+
+const onEffectChange = (evt) => {
   if (evt.target.matches('input[type="radio"]')) {
-    appliedEffect = evt.target.value;
-    showOrHideSlider(appliedEffect);
-    applyNewEffectToSlider(appliedEffect);
-    applyEffectToImage(appliedEffect);
+    applyEffect(evt.target.value);
   }
 };
 
-effectsList.addEventListener('change', applyEffect);
+effectsList.addEventListener('change', onEffectChange);
 
 sliderValueElement.value = SCALE_START_VALUE;
 
@@ -251,3 +242,89 @@ const applyFilterSettings = (values, handle, unecoded) => {
 };
 
 sliderElement.noUiSlider.on('update', applyFilterSettings);
+
+const onUploadCancelClick = () => {
+  uploadOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+
+  scaleValue = SCALE_START_VALUE;
+  changeScale(scaleValue);
+
+  appliedEffect = EFFECT_START_VALUE;
+  applyEffect(appliedEffect);
+
+  uploadForm.reset();
+};
+
+uploadCancel.addEventListener('click', onUploadCancelClick);
+
+const onKeyPress = (evt) => {
+  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
+    evt.preventDefault();
+    onUploadCancelClick();
+  }
+};
+
+document.addEventListener('keydown', onKeyPress);
+
+const openResultModal = (templateId) => {
+  const templateIdSelector = `#${templateId}`;
+  const rootSelector = `.${templateId}`;
+  const modalBodySelector = `.${templateId}__inner`;
+  const actionButtonSelector = `.${templateId}__button`;
+
+  const rootTemplate = document.querySelector(templateIdSelector)
+    .content
+    .querySelector(rootSelector);
+  const rootElement = rootTemplate.cloneNode(true);
+  body.appendChild(rootElement);
+
+  const actionButtonElement = document.querySelector(actionButtonSelector);
+
+  let onButtonClick = null;
+  let onKeydown = null;
+  let onRootClick = null;
+
+  const unregister = () => {
+    actionButtonElement.removeEventListener('click', onButtonClick);
+    document.removeEventListener('keydown', onKeydown);
+    rootElement.removeEventListener('click', onRootClick);
+  };
+
+  onButtonClick = () => {
+    removeNodeElement(rootElement);
+    unregister();
+  };
+  actionButtonElement.addEventListener('click', onButtonClick);
+
+  onKeydown = (evt) => {
+    deleteElementOnEsc(evt, rootElement);
+    unregister();
+  };
+  document.addEventListener('keydown', onKeydown);
+
+  const modalBodyElement = document.querySelector(modalBodySelector);
+
+  onRootClick = (evt) => {
+    if (!modalBodyElement.contains(evt.target)) {
+      removeNodeElement(rootElement);
+      unregister();
+    }
+  };
+  rootElement.addEventListener('click', onRootClick);
+};
+
+uploadForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const formData = new FormData(evt.target);
+
+  sendForm(formData)
+    .then(() => {
+      onUploadCancelClick();
+      openResultModal('success');
+    })
+    .catch(() => {
+      onUploadCancelClick();
+      openResultModal('error');
+    });
+});
