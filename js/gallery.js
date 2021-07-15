@@ -43,39 +43,42 @@ const showThumbnails = debounce(
   RERENDER_DELAY,
 );
 
+let userPhotos = [];
+
 getPhotos()
-  .then((userPhotos) => {
+  .then((loadedPhotos) => {
+    userPhotos = loadedPhotos.slice();
     showThumbnails(userPhotos);
     showFilters();
-
-    defaultFilterButton.addEventListener('click', () => {
-      changeActiveStyleButton();
-      defaultFilterButton.classList.add('img-filters__button--active');
-
-      const newPhotos = userPhotos.slice();
-      showThumbnails(newPhotos);
-    });
-
-    randomFilterButton.addEventListener('click', () => {
-      changeActiveStyleButton();
-      randomFilterButton.classList.add('img-filters__button--active');
-
-      const newPhotos = shuffleArray(userPhotos.slice())
-        .slice(0, MAX_RANDOM_PHOTO_NUMBER);
-      showThumbnails(newPhotos);
-    });
-
-    discussedFilterButton.addEventListener('click', () => {
-      changeActiveStyleButton();
-      discussedFilterButton.classList.add('img-filters__button--active');
-
-      const newPhotos = userPhotos
-        .slice()
-        .sort((min, max) => max.comments.length - min.comments.length);
-      showThumbnails(newPhotos);
-    });
   })
   .catch(() => showErrorMessage());
+
+defaultFilterButton.addEventListener('click', () => {
+  changeActiveStyleButton();
+  defaultFilterButton.classList.add('img-filters__button--active');
+
+  const newPhotos = userPhotos.slice();
+  showThumbnails(newPhotos);
+});
+
+randomFilterButton.addEventListener('click', () => {
+  changeActiveStyleButton();
+  randomFilterButton.classList.add('img-filters__button--active');
+
+  const newPhotos = shuffleArray(userPhotos.slice())
+    .slice(0, MAX_RANDOM_PHOTO_NUMBER);
+  showThumbnails(newPhotos);
+});
+
+discussedFilterButton.addEventListener('click', () => {
+  changeActiveStyleButton();
+  discussedFilterButton.classList.add('img-filters__button--active');
+
+  const newPhotos = userPhotos
+    .slice()
+    .sort((min, max) => max.comments.length - min.comments.length);
+  showThumbnails(newPhotos);
+});
 
 const openFormElement = document.querySelector('.img-upload__input');
 openFormElement.addEventListener('change', openForm);
