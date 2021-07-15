@@ -1206,7 +1206,6 @@ main {
  */
 
 .error,
-.load-error,
 .success {
   position: fixed;
   display: flex;
@@ -1223,7 +1222,6 @@ main {
 }
 
 .error__inner,
-.load-error__inner,
 .success__inner {
   position: relative;
   width: 600px;
@@ -1251,20 +1249,13 @@ main {
   padding-bottom: 75px;
 }
 
-.error__title,
-.load-error__title {
+.error__title {
   position: relative;
 
   margin: 0;
   margin-bottom: 50px;
-}
 
-.error__title {
   font-size: 32px;
-}
-
-.load-error__title {
-  font-size: 28px;
 }
 
 .success__title {
@@ -1274,7 +1265,6 @@ main {
   font-size: 32px;
 }
 
-.load-error__title::before,
 .error__title::before {
   content: "";
   position: absolute;
