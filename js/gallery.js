@@ -2,10 +2,10 @@ import {renderThumbnails} from './photo-thumbnails.js';
 import {openForm} from './upload-photo-modal.js';
 import {getPhotos} from './api.js';
 import {openModal} from './photo-detail-modal.js';
-import {removeAllClassesByRegexp} from './util.js';
+import {removeAllClassesByRegexp, shuffleArray} from './util.js';
 import {debounce} from './utils/debounce.js';
 
-const MAX_RANDON_PHOTO_NUMBER = 10;
+const MAX_RANDOM_PHOTO_NUMBER = 10;
 const filterBlock = document.querySelector('.img-filters');
 const filtersForm = document.querySelector('.img-filters__form');
 
@@ -60,10 +60,8 @@ getPhotos()
       changeActiveStyleButton();
       randomFilterButton.classList.add('img-filters__button--active');
 
-      const shuffledPhotos = userPhotos
-        .slice()
-        .sort(() => Math.random() - 0.5);
-      const newPhotos = shuffledPhotos.slice(0, MAX_RANDON_PHOTO_NUMBER);
+      const newPhotos = shuffleArray(userPhotos.slice())
+        .slice(0, MAX_RANDOM_PHOTO_NUMBER);
       showThumbnails(newPhotos);
     });
 

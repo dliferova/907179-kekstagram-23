@@ -54,4 +54,8 @@ const deleteElementOnEsc = (evt, element) => {
   }
 };
 
-export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent, removeAllClassesByRegexp, removeNodeElement, deleteElementOnEsc};
+const shuffleArray = (arr) => arr.map((element) => [Math.random(), element])
+  .sort()
+  .map((pair) => pair[1]);
+
+export {getRandomFromRange, checkStringLength, getRandomArrayElement, isEscEvent, removeAllClassesByRegexp, removeNodeElement, deleteElementOnEsc, shuffleArray};
