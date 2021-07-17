@@ -29,6 +29,9 @@ const sliderValueElement = document.querySelector('.effect-level__value');
 let scaleValue;
 let appliedEffect;
 
+let onKeyPress = null;
+let onUploadCancelClick = null;
+
 const Effects = {
   ORIGINAL: {
     id: 'none',
@@ -118,6 +121,7 @@ const initializeForm = () => {
   renderScaleValue();
   changeScale(scaleValue);
   sliderFieldset.classList.add('hidden');
+  document.addEventListener('keydown', onKeyPress);
 };
 
 export const openForm = () => {
@@ -245,7 +249,7 @@ const applyFilterSettings = (values, handle, unecoded) => {
 
 sliderElement.noUiSlider.on('update', applyFilterSettings);
 
-const onUploadCancelClick = () => {
+onUploadCancelClick = () => {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
 
@@ -256,18 +260,18 @@ const onUploadCancelClick = () => {
   applyEffect(appliedEffect);
 
   uploadForm.reset();
+
+  document.removeEventListener('keydown', onKeyPress);
 };
 
 uploadCancel.addEventListener('click', onUploadCancelClick);
 
-const onKeyPress = (evt) => {
+onKeyPress = (evt) => {
   if (isEscEvent(evt) && textHashtags !== document.activeElement && commentField !== document.activeElement) {
     evt.preventDefault();
     onUploadCancelClick();
   }
 };
-
-document.addEventListener('keydown', onKeyPress);
 
 const openResultModal = (templateId) => {
   const templateIdSelector = `#${templateId}`;
@@ -316,7 +320,7 @@ const openResultModal = (templateId) => {
   rootElement.addEventListener('click', onRootClick);
 };
 
-uploadForm.addEventListener('submit', (evt) => {
+const onUploadFormSubmit = (evt) => {
   evt.preventDefault();
   const formData = new FormData(evt.target);
 
@@ -329,4 +333,6 @@ uploadForm.addEventListener('submit', (evt) => {
       onUploadCancelClick();
       openResultModal('error');
     });
-});
+};
+
+uploadForm.addEventListener('submit', onUploadFormSubmit);

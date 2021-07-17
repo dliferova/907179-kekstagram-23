@@ -84,23 +84,31 @@ const renderData = (rootElement, photo) => {
 
   const modalCloseButton = rootElement.querySelector('.big-picture__cancel');
 
+  let onCloseButtonCLick = null;
+  let onEscClick = null;
+
   const closeModal = () => {
     rootElement.classList.add('hidden');
     document.querySelector('body').classList.remove('modal-open');
     rootElement.querySelector('.social__comments').innerHTML = null;
-    document.querySelector('.social__comments-loader').removeEventListener('click', onLoadCommentsButtonClick);
+    commentsLoaderButton.removeEventListener('click', onLoadCommentsButtonClick);
+    modalCloseButton.removeEventListener('click', onCloseButtonCLick);
+    document.removeEventListener('keydown', onEscClick);
   };
 
-  modalCloseButton.addEventListener('click', () => {
+  onCloseButtonCLick = () => {
     closeModal(rootElement);
-  });
+  };
 
-  document.addEventListener('keydown', (evt) => {
+  modalCloseButton.addEventListener('click', onCloseButtonCLick);
+
+  onEscClick = (evt) => {
     if (isEscEvent(evt)) {
       evt.preventDefault();
       closeModal(rootElement);
     }
-  });
+  };
+  document.addEventListener('keydown', onEscClick);
 };
 
 export const openModal = function (photo) {
