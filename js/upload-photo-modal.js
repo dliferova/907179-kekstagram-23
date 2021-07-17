@@ -12,6 +12,7 @@ const EFFECT_START_VALUE = 'none';
 
 const body = document.querySelector('body');
 const uploadForm = document.querySelector('.img-upload__form');
+const openFormElement = document.querySelector('.img-upload__input');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const uploadCancel = uploadForm.querySelector('.img-upload__cancel');
 const uploadText = uploadForm.querySelector('.img-upload__text');
@@ -20,7 +21,8 @@ const commentField = uploadText.querySelector('.text__description');
 const scaleUp = uploadForm.querySelector('.scale__control--bigger');
 const scaleInput = uploadForm.querySelector('.scale__control--value');
 const scaleDown = uploadForm.querySelector('.scale__control--smaller');
-const previewImg = uploadForm.querySelector('.img-upload__preview');
+const previewImgContainer = uploadForm.querySelector('.img-upload__preview');
+const previewImg = previewImgContainer.querySelector('img');
 const effectsList = document.querySelector('.effects__list');
 const sliderElement = document.querySelector('.effect-level__slider');
 const sliderFieldset = document.querySelector('.effect-level');
@@ -92,7 +94,7 @@ const renderScaleValue = () => {
 };
 
 const changeScale = (value) => {
-  previewImg.style.transform = `scale(${value / 100})`;
+  previewImgContainer.style.transform = `scale(${value / 100})`;
 };
 
 const onScaleUpClick = () => {
@@ -124,10 +126,20 @@ const initializeForm = () => {
   document.addEventListener('keydown', onKeyPress);
 };
 
+const loadPhoto = () => {
+  const file = openFormElement.files[0];
+  const reader = new FileReader();
+  reader.addEventListener('load', () => {
+    previewImg.src = reader.result;
+  });
+  reader.readAsDataURL(file);
+};
+
 export const openForm = () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
   initializeForm();
+  loadPhoto();
 };
 
 const onHashtagsInput = () => {
@@ -207,8 +219,8 @@ const applyNewEffectToSlider = (effectId) => {
 };
 
 const applyEffectToImage = (effectId) => {
-  removeAllClassesByRegexp(previewImg, /effects__preview--.*/);
-  previewImg.classList.add(`effects__preview--${effectId}`);
+  removeAllClassesByRegexp(previewImgContainer, /effects__preview--.*/);
+  previewImgContainer.classList.add(`effects__preview--${effectId}`);
 };
 
 const applyEffect = (effect) => {
@@ -233,17 +245,17 @@ noUiSlider.create(sliderElement, sliderOptions);
 const applyFilterSettings = (values, handle, unecoded) => {
   sliderValueElement.value = unecoded[handle];
   if (appliedEffect === 'none') {
-    previewImg.style.removeProperty('filter');
+    previewImgContainer.style.removeProperty('filter');
   } else if (appliedEffect === 'chrome') {
-    previewImg.style.filter = `grayscale(${sliderValueElement.value})`;
+    previewImgContainer.style.filter = `grayscale(${sliderValueElement.value})`;
   } else if (appliedEffect === 'sepia') {
-    previewImg.style.filter = `sepia(${sliderValueElement.value})`;
+    previewImgContainer.style.filter = `sepia(${sliderValueElement.value})`;
   } else if (appliedEffect === 'marvin') {
-    previewImg.style.filter = `invert(${sliderValueElement.value}%)`;
+    previewImgContainer.style.filter = `invert(${sliderValueElement.value}%)`;
   } else if (appliedEffect === 'phobos') {
-    previewImg.style.filter = `blur(${sliderValueElement.value}px)`;
+    previewImgContainer.style.filter = `blur(${sliderValueElement.value}px)`;
   } else if (appliedEffect === 'heat') {
-    previewImg.style.filter = `brightness(${sliderValueElement.value})`;
+    previewImgContainer.style.filter = `brightness(${sliderValueElement.value})`;
   }
 };
 
