@@ -260,7 +260,7 @@ const onUploadCancelClick = () => {
 uploadCancel.addEventListener('click', onUploadCancelClick);
 
 const onKeyPress = (evt) => {
-  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
+  if (isEscEvent(evt) && textHashtags !== document.activeElement && commentField !== document.activeElement) {
     evt.preventDefault();
     onUploadCancelClick();
   }
