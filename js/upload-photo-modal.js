@@ -207,6 +207,7 @@ const applyEffectToImage = (effectId) => {
 };
 
 const applyEffect = (effect) => {
+  appliedEffect = effect;
   showOrHideSlider(effect);
   applyNewEffectToSlider(effect);
   applyEffectToImage(effect);
