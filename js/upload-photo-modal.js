@@ -127,28 +127,29 @@ export const openForm = () => {
 };
 
 const onHashtagsInput = () => {
-
-  const value = textHashtags.value.toLowerCase();
-  const hashtags = value.split(' ');
-  const hasInvalidHashtag = hashtags.some((hashtag) => !REG_HASTAG.test(hashtag));
-
-  if (hasInvalidHashtag) {
-    textHashtags.setCustomValidity('Используйте после # буквы и числа без пробелов, спецсимволы (#, @, $ и т. п.) и символы пунктуации');
-  } else if (hashtags.length !== new Set(hashtags).size) {
-    textHashtags.setCustomValidity('Хештег уже используется');
-  } else if (hashtags.length > MAX_HASTAGS_COUNT) {
-    textHashtags.setCustomValidity('Вы не можете использовать более 5 хештегов');
-  } else {
+  if (textHashtags.value === '') {
     textHashtags.setCustomValidity('');
-  }
+  } else {
+    const value = textHashtags.value.toLowerCase();
+    const hashtags = value.split(' ');
+    const hasInvalidHashtag = hashtags.some((hashtag) => !REG_HASTAG.test(hashtag));
 
+    if (hasInvalidHashtag) {
+      textHashtags.setCustomValidity('Используйте после # буквы и числа без пробелов, спецсимволы (#, @, $ и т. п.) и символы пунктуации. Максимальная длина хэштега 20 символов.');
+    } else if (hashtags.length !== new Set(hashtags).size) {
+      textHashtags.setCustomValidity('Хештег уже используется');
+    } else if (hashtags.length > MAX_HASTAGS_COUNT) {
+      textHashtags.setCustomValidity('Вы не можете использовать более 5 хештегов');
+    } else {
+      textHashtags.setCustomValidity('');
+    }
+  }
   textHashtags.reportValidity();
 };
 
 textHashtags.addEventListener('input', onHashtagsInput);
 
 const onCommentInput = () => {
-
   if (!checkStringLength(commentField.value, MAX_COMMENT_LENGTH)) {
     commentField.setCustomValidity(`Длина вашего комментария не может быть больше ${MAX_COMMENT_LENGTH} символов`);
   } else {
