@@ -12,6 +12,7 @@ const EFFECT_START_VALUE = 'none';
 
 const body = document.querySelector('body');
 const uploadForm = document.querySelector('.img-upload__form');
+const openFormElement = document.querySelector('.img-upload__input');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const uploadCancel = uploadForm.querySelector('.img-upload__cancel');
 const uploadText = uploadForm.querySelector('.img-upload__text');
@@ -20,7 +21,8 @@ const commentField = uploadText.querySelector('.text__description');
 const scaleUp = uploadForm.querySelector('.scale__control--bigger');
 const scaleInput = uploadForm.querySelector('.scale__control--value');
 const scaleDown = uploadForm.querySelector('.scale__control--smaller');
-const previewImg = uploadForm.querySelector('.img-upload__preview');
+const previewImgContainer = uploadForm.querySelector('.img-upload__preview');
+const previewImg = previewImgContainer.querySelector('img');
 const effectsList = document.querySelector('.effects__list');
 const sliderElement = document.querySelector('.effect-level__slider');
 const sliderFieldset = document.querySelector('.effect-level');
@@ -28,6 +30,9 @@ const sliderValueElement = document.querySelector('.effect-level__value');
 
 let scaleValue;
 let appliedEffect;
+
+let onKeyPress = null;
+let onUploadCancelClick = null;
 
 const Effects = {
   ORIGINAL: {
@@ -89,7 +94,7 @@ const renderScaleValue = () => {
 };
 
 const changeScale = (value) => {
-  previewImg.style.transform = `scale(${value / 100})`;
+  previewImgContainer.style.transform = `scale(${value / 100})`;
 };
 
 const onScaleUpClick = () => {
@@ -118,37 +123,49 @@ const initializeForm = () => {
   renderScaleValue();
   changeScale(scaleValue);
   sliderFieldset.classList.add('hidden');
+  document.addEventListener('keydown', onKeyPress);
+};
+
+const loadPhoto = () => {
+  const file = openFormElement.files[0];
+  const reader = new FileReader();
+  reader.addEventListener('load', () => {
+    previewImg.src = reader.result;
+  });
+  reader.readAsDataURL(file);
 };
 
 export const openForm = () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
   initializeForm();
+  loadPhoto();
 };
 
 const onHashtagsInput = () => {
-
-  const value = textHashtags.value.toLowerCase();
-  const hashtags = value.split(' ');
-  const hasInvalidHashtag = hashtags.some((hashtag) => !REG_HASTAG.test(hashtag));
-
-  if (hasInvalidHashtag) {
-    textHashtags.setCustomValidity('Используйте после # буквы и числа без пробелов, спецсимволы (#, @, $ и т. п.) и символы пунктуации');
-  } else if (hashtags.length !== new Set(hashtags).size) {
-    textHashtags.setCustomValidity('Хештег уже используется');
-  } else if (hashtags.length > MAX_HASTAGS_COUNT) {
-    textHashtags.setCustomValidity('Вы не можете использовать более 5 хештегов');
-  } else {
+  if (textHashtags.value === '') {
     textHashtags.setCustomValidity('');
-  }
+  } else {
+    const value = textHashtags.value.toLowerCase();
+    const hashtags = value.split(' ');
+    const hasInvalidHashtag = hashtags.some((hashtag) => !REG_HASTAG.test(hashtag));
 
+    if (hasInvalidHashtag) {
+      textHashtags.setCustomValidity('Используйте после # буквы и числа без пробелов, спецсимволы (#, @, $ и т. п.) и символы пунктуации. Максимальная длина хэштега 20 символов.');
+    } else if (hashtags.length !== new Set(hashtags).size) {
+      textHashtags.setCustomValidity('Хештег уже используется');
+    } else if (hashtags.length > MAX_HASTAGS_COUNT) {
+      textHashtags.setCustomValidity('Вы не можете использовать более 5 хештегов');
+    } else {
+      textHashtags.setCustomValidity('');
+    }
+  }
   textHashtags.reportValidity();
 };
 
 textHashtags.addEventListener('input', onHashtagsInput);
 
 const onCommentInput = () => {
-
   if (!checkStringLength(commentField.value, MAX_COMMENT_LENGTH)) {
     commentField.setCustomValidity(`Длина вашего комментария не может быть больше ${MAX_COMMENT_LENGTH} символов`);
   } else {
@@ -202,11 +219,12 @@ const applyNewEffectToSlider = (effectId) => {
 };
 
 const applyEffectToImage = (effectId) => {
-  removeAllClassesByRegexp(previewImg, /effects__preview--.*/);
-  previewImg.classList.add(`effects__preview--${effectId}`);
+  removeAllClassesByRegexp(previewImgContainer, /effects__preview--.*/);
+  previewImgContainer.classList.add(`effects__preview--${effectId}`);
 };
 
 const applyEffect = (effect) => {
+  appliedEffect = effect;
   showOrHideSlider(effect);
   applyNewEffectToSlider(effect);
   applyEffectToImage(effect);
@@ -227,23 +245,23 @@ noUiSlider.create(sliderElement, sliderOptions);
 const applyFilterSettings = (values, handle, unecoded) => {
   sliderValueElement.value = unecoded[handle];
   if (appliedEffect === 'none') {
-    previewImg.style.removeProperty('filter');
+    previewImgContainer.style.removeProperty('filter');
   } else if (appliedEffect === 'chrome') {
-    previewImg.style.filter = `grayscale(${sliderValueElement.value})`;
+    previewImgContainer.style.filter = `grayscale(${sliderValueElement.value})`;
   } else if (appliedEffect === 'sepia') {
-    previewImg.style.filter = `sepia(${sliderValueElement.value})`;
+    previewImgContainer.style.filter = `sepia(${sliderValueElement.value})`;
   } else if (appliedEffect === 'marvin') {
-    previewImg.style.filter = `invert(${sliderValueElement.value}%)`;
+    previewImgContainer.style.filter = `invert(${sliderValueElement.value}%)`;
   } else if (appliedEffect === 'phobos') {
-    previewImg.style.filter = `blur(${sliderValueElement.value}px)`;
+    previewImgContainer.style.filter = `blur(${sliderValueElement.value}px)`;
   } else if (appliedEffect === 'heat') {
-    previewImg.style.filter = `brightness(${sliderValueElement.value})`;
+    previewImgContainer.style.filter = `brightness(${sliderValueElement.value})`;
   }
 };
 
 sliderElement.noUiSlider.on('update', applyFilterSettings);
 
-const onUploadCancelClick = () => {
+onUploadCancelClick = () => {
   uploadOverlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
 
@@ -254,18 +272,18 @@ const onUploadCancelClick = () => {
   applyEffect(appliedEffect);
 
   uploadForm.reset();
+
+  document.removeEventListener('keydown', onKeyPress);
 };
 
 uploadCancel.addEventListener('click', onUploadCancelClick);
 
-const onKeyPress = (evt) => {
-  if (isEscEvent(evt) && textHashtags !== document.activeElement) {
+onKeyPress = (evt) => {
+  if (isEscEvent(evt) && textHashtags !== document.activeElement && commentField !== document.activeElement) {
     evt.preventDefault();
     onUploadCancelClick();
   }
 };
-
-document.addEventListener('keydown', onKeyPress);
 
 const openResultModal = (templateId) => {
   const templateIdSelector = `#${templateId}`;
@@ -314,7 +332,7 @@ const openResultModal = (templateId) => {
   rootElement.addEventListener('click', onRootClick);
 };
 
-uploadForm.addEventListener('submit', (evt) => {
+const onUploadFormSubmit = (evt) => {
   evt.preventDefault();
   const formData = new FormData(evt.target);
 
@@ -327,4 +345,6 @@ uploadForm.addEventListener('submit', (evt) => {
       onUploadCancelClick();
       openResultModal('error');
     });
-});
+};
+
+uploadForm.addEventListener('submit', onUploadFormSubmit);
