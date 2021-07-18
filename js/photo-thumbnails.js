@@ -1,8 +1,8 @@
 export const renderThumbnails = (photos) => {
   const picturesFromUsersContainer =  document.querySelector('.pictures');
 
-  const el = picturesFromUsersContainer.querySelectorAll('.picture');
-  el.forEach((element) => picturesFromUsersContainer.removeChild( element));
+  const elements = picturesFromUsersContainer.querySelectorAll('.picture');
+  elements.forEach((element) => picturesFromUsersContainer.removeChild(element));
 
   const photosListFragment = document.createDocumentFragment();
 

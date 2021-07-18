@@ -6,15 +6,14 @@ import {removeAllClassesByRegexp, shuffleArray} from './util.js';
 import {debounce} from './utils/debounce.js';
 
 const MAX_RANDOM_PHOTO_NUMBER = 10;
+const RERENDER_DELAY = 500;
+
 const filterBlock = document.querySelector('.img-filters');
 const filtersForm = document.querySelector('.img-filters__form');
-
 const defaultFilterButton = filtersForm.querySelector('#filter-default');
 const randomFilterButton = filtersForm.querySelector('#filter-random');
 const discussedFilterButton = filtersForm.querySelector('#filter-discussed');
 const filterButtons = filtersForm.querySelectorAll('.img-filters__button');
-
-const RERENDER_DELAY = 500;
 
 const showErrorMessage = () => {
   const errorMessageFragment = document.createDocumentFragment();
