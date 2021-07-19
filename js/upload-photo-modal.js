@@ -94,7 +94,7 @@ const renderScaleValue = () => {
 };
 
 const changeScale = (value) => {
-  previewImgContainer.style.transform = `scale(${value / 100})`;
+  previewImg.style.transform = `scale(${value / 100})`;
 };
 
 const onScaleUpClick = () => {
@@ -219,8 +219,8 @@ const applyNewEffectToSlider = (effectId) => {
 };
 
 const applyEffectToImage = (effectId) => {
-  removeAllClassesByRegexp(previewImgContainer, /effects__preview--.*/);
-  previewImgContainer.classList.add(`effects__preview--${effectId}`);
+  removeAllClassesByRegexp(previewImg, /effects__preview--.*/);
+  previewImg.classList.add(`effects__preview--${effectId}`);
 };
 
 const applyEffect = (effect) => {
@@ -245,17 +245,17 @@ noUiSlider.create(sliderElement, sliderOptions);
 const applyFilterSettings = (values, handle, unecoded) => {
   sliderValueElement.value = unecoded[handle];
   if (appliedEffect === 'none') {
-    previewImgContainer.style.removeProperty('filter');
+    previewImg.style.removeProperty('filter');
   } else if (appliedEffect === 'chrome') {
-    previewImgContainer.style.filter = `grayscale(${sliderValueElement.value})`;
+    previewImg.style.filter = `grayscale(${sliderValueElement.value})`;
   } else if (appliedEffect === 'sepia') {
-    previewImgContainer.style.filter = `sepia(${sliderValueElement.value})`;
+    previewImg.style.filter = `sepia(${sliderValueElement.value})`;
   } else if (appliedEffect === 'marvin') {
-    previewImgContainer.style.filter = `invert(${sliderValueElement.value}%)`;
+    previewImg.style.filter = `invert(${sliderValueElement.value}%)`;
   } else if (appliedEffect === 'phobos') {
-    previewImgContainer.style.filter = `blur(${sliderValueElement.value}px)`;
+    previewImg.style.filter = `blur(${sliderValueElement.value}px)`;
   } else if (appliedEffect === 'heat') {
-    previewImgContainer.style.filter = `brightness(${sliderValueElement.value})`;
+    previewImg.style.filter = `brightness(${sliderValueElement.value})`;
   }
 };
 
